@@ -9,15 +9,11 @@ TASK_STATUS=0
 CODEBASE_LOCATION="${WORKSPACE}"/"${CODEBASE_DIR}"
 logInfoMessage "I'll do processing at [$CODEBASE_LOCATION]"
 sleep  $SLEEP_DURATION
-cd  "${CODEBASE_LOCATION}"
+cd "${CODEBASE_LOCATION}"
 
 TASK_STATUS=0
 
-if [condition]; then
-    logErrorMessage "Done the required operation"
-else
-    TASK_STATUS=1
-    logErrorMessage "Target server not provided please check"
+result=`getLineForAString Dockerfile FROM`
+TASK_STATUS=`textExistsInALine $result ${WHITELIST_IMAGE_NAME}`
 
-fi
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
