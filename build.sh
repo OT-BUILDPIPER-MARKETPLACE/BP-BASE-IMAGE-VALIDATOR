@@ -12,9 +12,12 @@ sleep  $SLEEP_DURATION
 cd "${CODEBASE_LOCATION}"
 
 TASK_STATUS=0
+DOCKER_FILE_PARENT_PATH=`getDockerfileParentPath`
+DOCKER_FILE_NAME=`getDockerfileName`
 
-logInfoMessage "Finding [${WHITELIST_IMAGE_NAME}] text in Dockerfile"
-cat Dockerfile
+DOCKERFILE_PATH="${DOCKER_FILE_PARENT_PATH}/${DOCKER_FILE_NAME}"
+logInfoMessage "Finding [${WHITELIST_IMAGE_NAME}] text in ${DOCKERFILE_PATH}"
+cat ${DOCKERFILE_PATH}
 echo ""
 result=`getLineForAString Dockerfile FROM`
 

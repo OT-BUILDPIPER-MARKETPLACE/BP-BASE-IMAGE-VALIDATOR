@@ -1,5 +1,5 @@
 # BP-SHELL-STEP-TEMPLATE
-I'll <do xyz>
+I'll validate if the whitelisted base image is being used
 
 ## Setup
 * Clone the code available at [BP-BASE-IMAGE-VALIDATOR
