@@ -3,7 +3,6 @@ source /opt/buildpiper/shell-functions/functions.sh
 source /opt/buildpiper/shell-functions/log-functions.sh
 source /opt/buildpiper/shell-functions/str-functions.sh
 source /opt/buildpiper/shell-functions/file-functions.sh
-source /opt/buildpiper/shell-functions/aws-functions.sh
 
 TASK_STATUS=0
 
