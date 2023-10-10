@@ -9,7 +9,7 @@ I'll <do xyz>
 ```
 git submodule init
 git submodule update
-docker build -t ot/bp-base-image-validator:0.1:0.1 .
+docker build -t ot/bp-base-image-validator:0.1 .
 ```
 
 * Do local testing

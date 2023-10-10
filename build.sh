@@ -13,7 +13,13 @@ cd "${CODEBASE_LOCATION}"
 
 TASK_STATUS=0
 
+logInfoMessage "Finding [${WHITELIST_IMAGE_NAME}] text in Dockerfile"
+cat Dockerfile
+
 result=`getLineForAString Dockerfile FROM`
+
+logInfoMessage "Got below lines in Dockerfile [${result}]"
+
 TASK_STATUS=`textExistsInALine $result ${WHITELIST_IMAGE_NAME}`
 
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
