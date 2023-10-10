@@ -19,7 +19,7 @@ DOCKERFILE_PATH="${DOCKER_FILE_PARENT_PATH}/${DOCKER_FILE_NAME}"
 logInfoMessage "Finding [${WHITELIST_IMAGE_NAME}] text in ${DOCKERFILE_PATH}"
 cat ${DOCKERFILE_PATH}
 echo ""
-result=`getLineForAString Dockerfile FROM`
+result=`getLineForAString ${DOCKERFILE_PATH} FROM`
 
 logInfoMessage "Got below lines in Dockerfile [${result}]"
 
