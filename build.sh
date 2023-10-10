@@ -15,7 +15,7 @@ TASK_STATUS=0
 
 logInfoMessage "Finding [${WHITELIST_IMAGE_NAME}] text in Dockerfile"
 cat Dockerfile
-
+echo ""
 result=`getLineForAString Dockerfile FROM`
 
 logInfoMessage "Got below lines in Dockerfile [${result}]"

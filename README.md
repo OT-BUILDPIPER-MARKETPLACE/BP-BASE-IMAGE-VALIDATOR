@@ -14,10 +14,15 @@ docker build -t ot/bp-base-image-validator:0.1 .
 
 * Do local testing
 ```
-docker run -it --rm -v $PWD:/src -e var1="key1" -e var2="key2" ot/<image-name>:0.1
+Successful scenario
+docker run -it --rm -v $PWD:/src -e WORKSPACE=/ -e CODEBASE_DIR=src ot/bp-base-image-validator:0.1
+
+Failure scenario
+docker run -it --rm -v $PWD:/src -e WHITELIST_IMAGE_NAME=alpn  -e WORKSPACE=/ -e CODEBASE_DIR=src ot/bp-base-image-validator:0.1
+
 ```
 
 * Debug
 ```
-docker run -it --rm -v $PWD:/src -e var1="key1" -e var2="key2" --entrypoint sh ot/<image-name>:0.1
+docker run -it --rm -v $PWD:/src -e SLEEP_DURATION=10m -e WORKSPACE=/ -e CODEBASE_DIR=src ot/bp-base-image-validator:0.1
 ```
