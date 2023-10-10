@@ -20,6 +20,6 @@ result=`getLineForAString Dockerfile FROM`
 
 logInfoMessage "Got below lines in Dockerfile [${result}]"
 
-TASK_STATUS=`textExistsInALine $result ${WHITELIST_IMAGE_NAME}`
+TASK_STATUS=`textExistsInALine "$result" "${WHITELIST_IMAGE_NAME}"`
 
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
