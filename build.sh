@@ -12,8 +12,8 @@ logInfoMessage "I'll do processing at [$CODEBASE_LOCATION]"
 sleep  $SLEEP_DURATION
 cd "${CODEBASE_LOCATION}"
 
-DOCKER_FILE_PARENT_PATH=`getDockerfileParentPath`
-DOCKER_FILE_NAME=`getDockerfileName`
+DOCKER_FILE_PARENT_PATH=`getDockerfilePath | awk -F: '{print $2}'`
+DOCKER_FILE_NAME=`getDockerfilePath | awk -F: '{print $1}'`
 
 DOCKERFILE_PATH="${DOCKER_FILE_PARENT_PATH}/${DOCKER_FILE_NAME}"
 logInfoMessage "Finding [${WHITELIST_IMAGES_NAME}] text in ${DOCKERFILE_PATH}"
