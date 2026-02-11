@@ -25,15 +25,19 @@ RUN mkdir -p \
         /src /bp /opt /usr/local/bin /tmp /app /home/buildpiper
 
 # Copy your scripts and functions
-COPY --chown=buildpiper:buildpiper build.sh .
+COPY --chown=buildpiper:buildpiper build.sh /home/buildpiper/build.sh
 COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS/ /opt/buildpiper/shell-functions/
 
-RUN chmod +x build.sh
+RUN chmod +x /home/buildpiper/build.sh
 
-ENV SLEEP_DURATION=5s
-ENV ACTIVITY_SUB_TASK_CODE=REPLACE_IT
-ENV VALIDATION_FAILURE_ACTION=WARNING
+ENV ACTIVITY_SUB_TASK_CODE="BP-BASE-IMAGE-VALIDATOR"
+ENV SLEEP_DURATION="0s"
+
 
 USER buildpiper
+WORKDIR /home/buildpiper
+
+
+
 
 ENTRYPOINT ["./build.sh"]
