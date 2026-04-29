@@ -16,10 +16,21 @@ sleep "${SLEEP_DURATION}"
 
 if [ ! -d "${CODEBASE_LOCATION}" ]; then
     logErrorMessage "Codebase location does not exist: ${CODEBASE_LOCATION}"
+    add_event "CODEBASE VALIDATION" "Failed" \
+          "Codebase location not found" \
+          "Path: ${CODEBASE_LOCATION}"
     TASK_STATUS=1
     saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
     exit 0
 fi
+
+add_event "CODEBASE VALIDATION" "Successful" \
+      "Codebase location verified" \
+      "Path: ${CODEBASE_LOCATION}"
+
+add_event "INITIALIZATION" "Successful" \
+      "Task initialization completed" \
+      "Processing at: [${CODEBASE_LOCATION}]"
 
 cd "${CODEBASE_LOCATION}"
 
@@ -28,8 +39,14 @@ cd "${CODEBASE_LOCATION}"
 # -----------------------------
 if [ "$(ls -A "${CODEBASE_LOCATION}")" ]; then
     logInfoMessage "Directory has content."
+    add_event "DIRECTORY CHECK" "Successful" \
+          "Directory is not empty" \
+          "Ready for validation"
 else
     logErrorMessage "Directory is empty."
+    add_event "DIRECTORY CHECK" "Failed" \
+          "Directory is empty" \
+          "No files to validate"
     TASK_STATUS=1
 fi
 
@@ -48,12 +65,21 @@ if [ -z "${DOCKERFILE_PATH}" ] || [ "${DOCKERFILE_PATH}" == "null" ]; then
 
     if [ -z "${DOCKERFILE_PATH}" ]; then
         logErrorMessage "Auto-search failed. No Dockerfile found."
+        add_event "DOCKERFILE SEARCH" "Failed" \
+              "No Dockerfile found in codebase" \
+              "Searched up to 5 levels deep"
         TASK_STATUS=1
     else
         logInfoMessage "Dockerfile auto-found at: ${DOCKERFILE_PATH}"
+        add_event "DOCKERFILE SEARCH" "Successful" \
+              "Dockerfile found via auto-search" \
+              "Path: ${DOCKERFILE_PATH}"
     fi
 else
     logInfoMessage "Dockerfile path retrieved: ${DOCKERFILE_PATH}"
+    add_event "DOCKERFILE SEARCH" "Successful" \
+          "Dockerfile path retrieved from build details" \
+          "Path: ${DOCKERFILE_PATH}"
 fi
 
 # Remove leading ./ if exists
@@ -70,12 +96,21 @@ if [ -f "${FULL_DOCKERFILE_PATH}" ]; then
 
     if [ -n "${BASE_IMAGE}" ]; then
         logInfoMessage "Base image found: ${BASE_IMAGE}"
+        add_event "BASE IMAGE VALIDATION" "Successful" \
+              "Base image identified" \
+              "Base Image: ${BASE_IMAGE}"
     else
         logErrorMessage "No valid FROM instruction found in Dockerfile."
+        add_event "BASE IMAGE VALIDATION" "Failed" \
+              "No FROM instruction found" \
+              "File: ${FULL_DOCKERFILE_PATH}"
         TASK_STATUS=1
     fi
 else
-    logErrorMessage "Dockerfile not found at: ${FULL_DOCKERFILEFILE_PATH}"
+    logErrorMessage "Dockerfile not found at: ${FULL_DOCKERFILE_PATH}"
+    add_event "BASE IMAGE VALIDATION" "Failed" \
+          "Dockerfile not found at expected path" \
+          "Expected: ${FULL_DOCKERFILE_PATH}"
     TASK_STATUS=1
 fi
 
@@ -101,5 +136,8 @@ EOF
 logInfoMessage "Generated JSON report at: ${REPORT_PATH}"
 
 saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}" 2>/dev/null || true
+add_event "TASK EXECUTION" "Successful" \
+      "Base image validation task completed" \
+      "Status: $( [ $TASK_STATUS -eq 0 ] && echo "Success" || echo "Failure" )"
 exit 0
 
