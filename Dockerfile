@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.19
 
 RUN apk add --no-cache bash jq
 
@@ -6,7 +6,7 @@ RUN apk add --no-cache bash jq
 RUN addgroup -g 65522 buildpiper && \
     adduser -D -u 65522 -G buildpiper -h /home/buildpiper buildpiper
 
-# Recreate all directories present in the referenced Dockerfile
+# Create required directories
 RUN mkdir -p \
     /src/reports \
     /bp/data \
@@ -15,14 +15,9 @@ RUN mkdir -p \
     /opt/buildpiper/shell-functions \
     /opt/buildpiper/data \
     /usr/local/bin \
-    /etc/timezone \
-    /opt/python_versions \
-    /opt/jdk \
-    /opt/maven \
-    /app/venv \
     /tmp && \
     chown -R buildpiper:buildpiper \
-        /src /bp /opt /usr/local/bin /tmp /app /home/buildpiper
+        /src /bp /opt /usr/local/bin /tmp /home/buildpiper
 
 # Copy your scripts and functions
 COPY --chown=buildpiper:buildpiper build.sh /home/buildpiper/build.sh
