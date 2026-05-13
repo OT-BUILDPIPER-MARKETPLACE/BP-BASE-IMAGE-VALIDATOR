@@ -22,11 +22,7 @@ RUN mkdir -p \
 # Copy your scripts and functions
 COPY --chown=buildpiper:buildpiper build.sh /home/buildpiper/build.sh
 
-# Clone shell functions directly (avoids submodule init dependency in CI)
-RUN git clone --branch nr_0.5.1 --depth 1 \
-    https://github.com/OT-BUILDPIPER-MARKETPLACE/BP-BASE-SHELL-STEPS.git \
-    /opt/buildpiper/shell-functions && \
-    chown -R buildpiper:buildpiper /opt/buildpiper/shell-functions
+COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS /opt/buildpiper/shell-functions/
 
 RUN chmod +x /home/buildpiper/build.sh
 

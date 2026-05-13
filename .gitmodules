@@ -1,4 +1,0 @@
-[submodule "BP-BASE-SHELL-STEPS"]
-	path = BP-BASE-SHELL-STEPS
-	url = https://github.com/BUILDPIPER/BP-BASE-SHELL-STEPS.git
-	branch = nr_0.5.1
