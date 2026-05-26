@@ -117,7 +117,17 @@ add_event "WORKSPACE_NAVIGATION" "Successful" \
 logInfoMessage "> Resolving Dockerfile path..."
 
 RAW_PATH=$(getDockerfilePath)
-DOCKERFILE_PATH=$(echo "$RAW_PATH" | sed 's/:.$//' | sed 's/:$//')
+
+# getDockerfilePath returns 'DockerfileName:DirectoryName' (e.g. 'Dockerfile:emp_backend')
+# Parse name and directory, then reconstruct as 'dir/name'
+DOCKERFILE_NAME=$(echo "$RAW_PATH" | cut -d':' -f1)
+DOCKERFILE_DIR=$(echo "$RAW_PATH"  | cut -d':' -f2)
+
+if [ -n "$DOCKERFILE_DIR" ] && [ "$DOCKERFILE_DIR" != "$DOCKERFILE_NAME" ]; then
+    DOCKERFILE_PATH="${DOCKERFILE_DIR}/${DOCKERFILE_NAME}"
+else
+    DOCKERFILE_PATH="${DOCKERFILE_NAME}"
+fi
 
 if [ -z "${DOCKERFILE_PATH}" ] || [ "${DOCKERFILE_PATH}" == "null" ]; then
     logInfoMessage "> Dockerfile path not found in build metadata — running auto-search..."
