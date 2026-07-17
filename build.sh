@@ -7,7 +7,6 @@ source /opt/buildpiper/shell-functions/file-functions.sh
 source /opt/buildpiper/shell-functions/aws-functions.sh
 source /opt/buildpiper/shell-functions/getDataFile.sh
 
-TASK_STATUS=0
 
 CODEBASE_LOCATION="${WORKSPACE}/${CODEBASE_DIR}"
 
@@ -16,7 +15,7 @@ sleep "${SLEEP_DURATION}"
 
 if [ ! -d "${CODEBASE_LOCATION}" ]; then
     logErrorMessage "Codebase location does not exist: ${CODEBASE_LOCATION}"
-    TASK_STATUS=1
+    TASK_STATUS=$?
     saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}"
     exit 0
 fi
@@ -30,7 +29,7 @@ if [ "$(ls -A "${CODEBASE_LOCATION}")" ]; then
     logInfoMessage "Directory has content."
 else
     logErrorMessage "Directory is empty."
-    TASK_STATUS=1
+    TASK_STATUS=$?
 fi
 
 # -----------------------------
@@ -48,7 +47,7 @@ if [ -z "${DOCKERFILE_PATH}" ] || [ "${DOCKERFILE_PATH}" == "null" ]; then
 
     if [ -z "${DOCKERFILE_PATH}" ]; then
         logErrorMessage "Auto-search failed. No Dockerfile found."
-        TASK_STATUS=1
+        TASK_STATUS=$?
     else
         logInfoMessage "Dockerfile auto-found at: ${DOCKERFILE_PATH}"
     fi
@@ -72,11 +71,11 @@ if [ -f "${FULL_DOCKERFILE_PATH}" ]; then
         logInfoMessage "Base image found: ${BASE_IMAGE}"
     else
         logErrorMessage "No valid FROM instruction found in Dockerfile."
-        TASK_STATUS=1
+        TASK_STATUS=$?
     fi
 else
     logErrorMessage "Dockerfile not found at: ${FULL_DOCKERFILEFILE_PATH}"
-    TASK_STATUS=1
+    TASK_STATUS=$?
 fi
 
 # -----------------------------
