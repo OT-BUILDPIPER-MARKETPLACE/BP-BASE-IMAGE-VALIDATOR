@@ -1,12 +1,22 @@
-FROM alpine:latest
+FROM docker:28-cli
 
-RUN apk add --no-cache bash jq
+RUN apk add --no-cache \
+    bash \
+    jq \
+    grep \
+    gawk \
+    coreutils
 
-# Create non-root user
+RUN mkdir -p /usr/local/lib/docker/cli-plugins && \
+    wget -O /usr/local/lib/docker/cli-plugins/docker-scout \
+    https://github.com/docker/scout-cli/releases/latest/download/docker-scout_linux_amd64 && \
+    chmod +x /usr/local/lib/docker/cli-plugins/docker-scout
+
+
 RUN addgroup -g 65522 buildpiper && \
     adduser -D -u 65522 -G buildpiper -h /home/buildpiper buildpiper
 
-# Recreate all directories present in the referenced Dockerfile
+
 RUN mkdir -p \
     /src/reports \
     /bp/data \
@@ -22,22 +32,24 @@ RUN mkdir -p \
     /app/venv \
     /tmp && \
     chown -R buildpiper:buildpiper \
-        /src /bp /opt /usr/local/bin /tmp /app /home/buildpiper
+        /src \
+        /bp \
+        /opt \
+        /usr/local/bin \
+        /tmp \
+        /app \
+        /home/buildpiper
 
-# Copy your scripts and functions
+
 COPY --chown=buildpiper:buildpiper build.sh /home/buildpiper/build.sh
 COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS/ /opt/buildpiper/shell-functions/
 
 RUN chmod +x /home/buildpiper/build.sh
 
-ENV ACTIVITY_SUB_TASK_CODE="BP-BASE-IMAGE-VALIDATOR"
-ENV SLEEP_DURATION="0s"
-
+ENV ACTIVITY_SUB_TASK_CODE=BP-BASE-IMAGE-VALIDATOR
+ENV SLEEP_DURATION=0s
 
 USER buildpiper
 WORKDIR /home/buildpiper
-
-
-
 
 ENTRYPOINT ["./build.sh"]
