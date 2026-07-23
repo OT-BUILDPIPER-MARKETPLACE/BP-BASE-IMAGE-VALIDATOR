@@ -106,7 +106,7 @@ else
     logWarningMessage "Skipping CVE scan for base image: $base_image"
 fi
 
-
+saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
 # # -----------------------------
 # # 4. Generate JSON Report
 # # -----------------------------
