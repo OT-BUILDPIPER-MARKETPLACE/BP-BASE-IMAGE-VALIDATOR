@@ -79,52 +79,45 @@ if [ -n "$base_image" ]; then
     textExistsInALine "$base_image" "${WHITELIST_IMAGES_NAME}"
     if [ $? -eq 0 ]; then
         logInfoMessage "Image is whitelisted: $base_image"
+
+        	if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
+                if [ -n "$SCAN_SEVERITY" ]; then
+                        logInfoMessage "Scanning for CVEs in base image: $base_image as SCAN_SEVERITY is set to $SCAN_SEVERITY"
+
+                        docker-scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
+
+                        echo "Package,Severity,CVE" > reports/scout.csv
+
+                        awk '
+                        /^pkg:/ {pkg=$0}
+                        /^[[:space:]]*✗/ {
+                            sev=$2
+                            cve=$3
+                            print pkg "," sev "," cve
+                        }
+                        ' scout.txt >> reports/scout.csv
+
+                    if [ -n "${GLOBAL_TASK_ID}" ]; then
+                        cp -rf reports/* "/bp/execution_dir/${GLOBAL_TASK_ID}/"
+                        logInfoMessage "Copied reports to /bp/execution_dir/${GLOBAL_TASK_ID}/"
+                        TASK_STATUS=$?
+                    else
+                        logWarningMessage "GLOBAL_TASK_ID not set; skipping UI copy"
+                    fi
+
+                else
+                    logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
+                    TASK_STATUS=1
+                fi
+            else
+                logWarningMessage "Skipping CVE scan for base image: $base_image as BASE_IMAGE_HAS_VULNERABILITIES is not set to true."
+                TASK_STATUS=0
+            fi
+
     else
         logErrorMessage "Image is not whitelisted: $base_image"
         TASK_STATUS=1
-        saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
     fi
-fi
-
-if [ $? -eq 0 ]; then
-	logInfoMessage "Image is whitelisted. Now proceeding to base image vulnerability scanning."
-
-	if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
-    	if [ -n "$SCAN_SEVERITY" ]; then
-        logInfoMessage "Scanning for CVEs in base image: $base_image"
-
-        docker-scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
-
-        echo "Package,Severity,CVE" > reports/scout.csv
-
-        awk '
-        /^pkg:/ {pkg=$0}
-        /^[[:space:]]*✗/ {
-            sev=$2
-            cve=$3
-            print pkg "," sev "," cve
-        }
-        ' scout.txt >> reports/scout.csv
-
-        if [ -n "${GLOBAL_TASK_ID}" ]; then
-            cp -rf reports/* "/bp/execution_dir/${GLOBAL_TASK_ID}/"
-            logInfoMessage "Copied reports to /bp/execution_dir/${GLOBAL_TASK_ID}/"
-	        TASK_STATUS=$?
-        else
-            logWarningMessage "GLOBAL_TASK_ID not set; skipping UI copy"
-        fi
-
-    else
-        logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
-        TASK_STATUS=1
-    fi
-else
-    logWarningMessage "Skipping CVE scan for base image: $base_image"
-fi
-else 
-
-	logErrorMessage "Image is not whitelisted. Skipping the base image vulnerability scan."
-    TASK_STATUS=1
 fi
 
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
