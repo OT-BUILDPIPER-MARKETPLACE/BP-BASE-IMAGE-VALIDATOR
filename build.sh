@@ -80,16 +80,15 @@ if [ -n "$base_image" ]; then
     else
         logErrorMessage "Image is not whitelisted: $base_image"
         TASK_STATUS=1
+        exit 1
     fi
 fi
 
 if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
     if [ -n "$SCAN_SEVERITY" ]; then
-
-        logInfoMessage "Removing scout.txt and scout.csv"
         logInfoMessage "Scanning for CVEs in base image: $base_image"
 
-        docker scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
+        docker-scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
 
         echo "Package,Severity,CVE" > reports/scout.csv
 
@@ -118,26 +117,4 @@ else
     logWarningMessage "Skipping CVE scan for base image: $base_image"
 fi
 
-#saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
-# -----------------------------
-# 4. Generate JSON Report
-# -----------------------------
-
-REPORT_PATH="/bp/execution_dir/${GLOBAL_TASK_ID}/base_image_validation_report.json"
-
-cat <<EOF > "${REPORT_PATH}" 2>/dev/null || true
-{
-  "codebase_location": "${CODEBASE_LOCATION}",
-  "task_status": ${TASK_STATUS},
-  "dockerfile_path": "${FULL_DOCKERFILE_PATH}",
-  "base_image": "${BASE_IMAGE}",
-  "message": "$( [ $TASK_STATUS -eq 0 ] && echo "Validation successful" || echo "Validation failed" )",
-  "timestamp": "$(date +"%Y-%m-%d %H:%M:%S")"
-}
-EOF
-
-logInfoMessage "Generated JSON report at: ${REPORT_PATH}"
-
-saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}" 
-
-
+saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
