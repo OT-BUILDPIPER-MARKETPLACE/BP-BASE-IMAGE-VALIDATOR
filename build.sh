@@ -72,7 +72,7 @@ fi
 
 #WHITELIST_IMAGES_NAME="ubuntu:24.04,alpine:latest,node:20,python:3.12"
 
-if [ -n "$base_image" && -n "$WHITELIST_IMAGES_NAME" ]; then
+if [ -n "$base_image" ]; then
     logInfoMessage "The base image is: ${base_image}"
     textExistsInALine "$base_image" "${WHITELIST_IMAGES_NAME}"
     if [ $? -eq 0 ]; then
