@@ -106,28 +106,28 @@ else
     logWarningMessage "Skipping CVE scan for base image: $base_image"
 fi
 
-saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
-# # -----------------------------
-# # 4. Generate JSON Report
-# # -----------------------------
-# # Ensure execution dir is set
-# EXECUTION_DIR="${EXECUTION_DIR:-/bp/execution_dir}"
+#saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
+# -----------------------------
+# 4. Generate JSON Report
+# -----------------------------
+# Ensure execution dir is set
+EXECUTION_DIR="${EXECUTION_DIR:-/bp/execution_dir}"
 
-# REPORT_PATH="${EXECUTION_DIR}/base_image_validation_report.json"
+REPORT_PATH="${EXECUTION_DIR}/base_image_validation_report.json"
 
-# cat <<EOF > "${REPORT_PATH}" 2>/dev/null || true
-# {
-#   "codebase_location": "${CODEBASE_LOCATION}",
-#   "task_status": ${TASK_STATUS},
-#   "dockerfile_path": "${FULL_DOCKERFILE_PATH}",
-#   "base_image": "${BASE_IMAGE}",
-#   "message": "$( [ $TASK_STATUS -eq 0 ] && echo "Validation successful" || echo "Validation failed" )",
-#   "timestamp": "$(date +"%Y-%m-%d %H:%M:%S")"
-# }
-# EOF
+cat <<EOF > "${REPORT_PATH}" 2>/dev/null || true
+{
+  "codebase_location": "${CODEBASE_LOCATION}",
+  "task_status": ${TASK_STATUS},
+  "dockerfile_path": "${FULL_DOCKERFILE_PATH}",
+  "base_image": "${BASE_IMAGE}",
+  "message": "$( [ $TASK_STATUS -eq 0 ] && echo "Validation successful" || echo "Validation failed" )",
+  "timestamp": "$(date +"%Y-%m-%d %H:%M:%S")"
+}
+EOF
 
-# logInfoMessage "Generated JSON report at: ${REPORT_PATH}"
+logInfoMessage "Generated JSON report at: ${REPORT_PATH}"
 
-# saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}" 
+saveTaskStatus "${TASK_STATUS}" "${ACTIVITY_SUB_TASK_CODE}" 
 
 
