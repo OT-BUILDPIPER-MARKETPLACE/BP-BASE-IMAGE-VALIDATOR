@@ -8,10 +8,14 @@ source /opt/buildpiper/shell-functions/aws-functions.sh
 
 
 CODEBASE_LOCATION="${WORKSPACE}/${CODEBASE_DIR}"
-EXECUTION_DIR="${EXECUTION_DIR:-/bp/execution_dir}"
-
 logInfoMessage "I'll do processing at [${CODEBASE_LOCATION}]"
 sleep "${SLEEP_DURATION}"
+
+if [ -d "reports" ]; then
+    true
+else
+    mkdir reports
+fi
 
 if [ ! -d "${CODEBASE_LOCATION}" ]; then
     logErrorMessage "Codebase location does not exist: ${CODEBASE_LOCATION}"
@@ -80,14 +84,13 @@ fi
 
 if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
     if [ -n "$SCAN_SEVERITY" ]; then
-        rm -f scout.*
 
         logInfoMessage "Removing scout.txt and scout.csv"
         logInfoMessage "Scanning for CVEs in base image: $base_image"
 
         docker scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
 
-        echo "Package,Severity,CVE" > scout.csv
+        echo "Package,Severity,CVE" > reports/scout.csv
 
         awk '
         /^pkg:/ {pkg=$0}
@@ -96,9 +99,14 @@ if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
             cve=$3
             print pkg "," sev "," cve
         }
-        ' scout.txt >> scout.csv
+        ' scout.txt >> reports/scout.csv
 
-        cp scout.csv $EXECUTION_DIR
+        if [ -n "${GLOBAL_TASK_ID}" ]; then
+            cp -rf reports/* "/bp/execution_dir/${GLOBAL_TASK_ID}/"
+            logInfoMessage "Copied reports to /bp/execution_dir/${GLOBAL_TASK_ID}/"
+        else
+            logWarningMessage "GLOBAL_TASK_ID not set; skipping UI copy"
+        fi
 
     else
         logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
@@ -114,7 +122,7 @@ fi
 # 4. Generate JSON Report
 # -----------------------------
 
-REPORT_PATH="${EXECUTION_DIR}/base_image_validation_report.json"
+REPORT_PATH="/bp/execution_dir/${GLOBAL_TASK_ID}/base_image_validation_report.json"
 
 cat <<EOF > "${REPORT_PATH}" 2>/dev/null || true
 {
