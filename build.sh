@@ -8,6 +8,7 @@ source /opt/buildpiper/shell-functions/aws-functions.sh
 
 
 CODEBASE_LOCATION="${WORKSPACE}/${CODEBASE_DIR}"
+EXECUTION_DIR="${EXECUTION_DIR:-/bp/execution_dir}"
 
 logInfoMessage "I'll do processing at [${CODEBASE_LOCATION}]"
 sleep "${SLEEP_DURATION}"
@@ -112,8 +113,6 @@ fi
 # -----------------------------
 # 4. Generate JSON Report
 # -----------------------------
-# Ensure execution dir is set
-EXECUTION_DIR="${EXECUTION_DIR:-/bp/execution_dir}"
 
 REPORT_PATH="${EXECUTION_DIR}/base_image_validation_report.json"
 
