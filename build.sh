@@ -38,8 +38,8 @@ RAW_PATH=$(getDockerfilePath)
 
 # Clean the returned path
 if [[ -n "$RAW_PATH" && "$RAW_PATH" == *:* ]]; then
-    FILE="${RAW_PATH%%:*}"   
-    DIR="${RAW_PATH#*:}"     
+    FILE="${RAW_PATH%%:*}"
+    DIR="${RAW_PATH#*:}"
     DOCKERFILE_PATH="${DIR}/${FILE}"
     logInfoMessage "$DOCKERFILE_PATH"
 else
@@ -61,12 +61,14 @@ logInfoMessage "Base image extracted: $base_image"
 if [ -z "$base_image" ]; then
     logErrorMessage "Base image could not be determined."
     TASK_STATUS=1
+    saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
     exit 1
 fi
 
 if [ -z "$WHITELIST_IMAGES_NAME" ]; then
     logErrorMessage "WHITELIST_IMAGES_NAME is empty or not configured."
     TASK_STATUS=1
+    saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
     exit 1
 fi
 
@@ -80,6 +82,7 @@ if [ -n "$base_image" ]; then
     else
         logErrorMessage "Image is not whitelisted: $base_image"
         TASK_STATUS=1
+        saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
         exit 1
     fi
 fi
@@ -104,6 +107,7 @@ if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
         if [ -n "${GLOBAL_TASK_ID}" ]; then
             cp -rf reports/* "/bp/execution_dir/${GLOBAL_TASK_ID}/"
             logInfoMessage "Copied reports to /bp/execution_dir/${GLOBAL_TASK_ID}/"
+	        TASK_STATUS=$?
         else
             logWarningMessage "GLOBAL_TASK_ID not set; skipping UI copy"
         fi
@@ -111,6 +115,7 @@ if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
     else
         logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
         TASK_STATUS=1
+        saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
         exit 1
     fi
 else
