@@ -1,6 +1,5 @@
 FROM docker:28-cli
 
-
 RUN apk add --no-cache \
     bash \
     curl \
@@ -10,8 +9,10 @@ RUN apk add --no-cache \
     coreutils \
     tar
 
+
 RUN addgroup -g 65522 buildpiper && \
     adduser -D -u 65522 -G buildpiper -h /home/buildpiper buildpiper
+
 
 RUN mkdir -p \
     /src/reports \
@@ -38,13 +39,14 @@ RUN mkdir -p \
 
 USER buildpiper
 
-RUN curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | sh
+ENV DOCKER_SCOUT_INSTALL_DIR=/opt/docker-scout
 
-RUN mkdir -p /home/buildpiper/.docker && \
-    printf '{\n  "cliPluginsExtraDirs": ["/home/buildpiper/.docker/scout"]\n}\n' \
-    > /home/buildpiper/.docker/config.json
+RUN mkdir -p ${DOCKER_SCOUT_INSTALL_DIR} && \
+    curl -fsSL https://raw.githubusercontent.com/docker/scout-cli/main/install.sh | \
+    sh -s -- -b ${DOCKER_SCOUT_INSTALL_DIR}
 
-ENV PATH="/home/buildpiper/.docker/cli-plugins:${PATH}"
+ENV PATH="${DOCKER_SCOUT_INSTALL_DIR}:${PATH}"
+
 
 RUN docker-scout version
 
