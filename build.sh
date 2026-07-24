@@ -97,6 +97,8 @@ if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
         }
         ' scout.txt >> scout.csv
 
+        cp scout.csv $EXECUTION_DIR
+
     else
         logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
         TASK_STATUS=1
