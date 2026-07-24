@@ -83,12 +83,14 @@ if [ -n "$base_image" ]; then
         logErrorMessage "Image is not whitelisted: $base_image"
         TASK_STATUS=1
         saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
-        exit 1
     fi
 fi
 
-if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
-    if [ -n "$SCAN_SEVERITY" ]; then
+if [ $? -eq 0 ]; then
+	logInfoMessage "Image is whitelisted. Now proceeding to base image vulnerability scanning."
+
+	if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
+    	if [ -n "$SCAN_SEVERITY" ]; then
         logInfoMessage "Scanning for CVEs in base image: $base_image"
 
         docker-scout cves "$base_image" --only-severity "$SCAN_SEVERITY" | tee scout.txt
@@ -115,11 +117,14 @@ if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
     else
         logErrorMessage "SCAN_SEVERITY is not set. Skipping CVE scan."
         TASK_STATUS=1
-        saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
-        exit 1
     fi
 else
     logWarningMessage "Skipping CVE scan for base image: $base_image"
+fi
+else 
+
+	logErrorMessage "Image is not whitelisted. Skipping the base image vulnerability scan."
+    TASK_STATUS=1
 fi
 
 saveTaskStatus ${TASK_STATUS} ${ACTIVITY_SUB_TASK_CODE}
