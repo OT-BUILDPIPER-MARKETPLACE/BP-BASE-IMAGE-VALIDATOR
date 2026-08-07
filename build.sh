@@ -110,12 +110,13 @@ if [ -n "$base_image" ]; then
                     TASK_STATUS=1
                 fi
             else
-                logWarningMessage "Skipping CVE scan for base image: $base_image as BASE_IMAGE_HAS_VULNERABILITIES is not set to true."
+                logWarningMessage "Skipping CVE scan for base image: $base_image as BASE_IMAGE_HAS_VULNERABILITIES is not set to true and scan report is not generated."
                 TASK_STATUS=0
             fi
 
     else
         logErrorMessage "Image is not whitelisted: $base_image"
+        logWarningMessage "due to image is not whitelisted, skipping CVE scan for base image: $base_image and scan report is not generated."
         TASK_STATUS=1
     fi
 fi
