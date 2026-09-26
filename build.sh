@@ -80,7 +80,7 @@ if [ -n "$base_image" ]; then
     if [ $? -eq 0 ]; then
         logInfoMessage "Image is whitelisted: $base_image"
 
-        	if [ "$BASE_IMAGE_HAS_VULNERABILITIES" = "true" ]; then
+        	if [ "$BASE_IMAGE_SHA_VULNERABILITIES" = "true" ]; then
                 if [ -n "$SCAN_SEVERITY" ]; then
                         logInfoMessage "Scanning for CVEs in base image: $base_image as SCAN_SEVERITY is set to $SCAN_SEVERITY"
 
